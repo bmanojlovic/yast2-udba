@@ -18,3 +18,5 @@ mkinstalldirs
 stamp-h
 udba.pot
 autom4te.cache
+_cvsignore
+*~
