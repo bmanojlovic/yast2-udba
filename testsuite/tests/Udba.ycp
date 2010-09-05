@@ -1,0 +1,13 @@
+{
+
+// testedfiles: Udba.ycp
+
+include "testsuite.ycp";
+TESTSUITE_INIT([], nil);
+
+import "Udba";
+
+DUMP("Udba::Modified");
+TEST(``(Udba::Modified()), [], nil);
+
+}

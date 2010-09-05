@@ -1,0 +1,31 @@
+@HEADER-COMMENT@
+
+@HEADER@
+Requires:	yast2
+BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
+
+BuildArchitectures:	noarch
+
+Summary:	Universal Driver Build Assistant
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+%dir @yncludedir@/udba
+@yncludedir@/udba/*
+@clientdir@/udba.ycp
+@clientdir@/udba_*.ycp
+@moduledir@/Udba.*
+@moduledir@/Udba2.*
+@desktopdir@/udba.desktop
+%doc @docdir@

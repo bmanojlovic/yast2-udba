@@ -1,0 +1,45 @@
+How this is suppose to work... (for now)
+
+- user selects UDBA from yast or starts udba script (same...)
+- user is provided with list of already installed recipes something like
+  picture bellow 
+
+--------------------------------------------------------------
+|     Package Name    | Built |    Descritption              |
+|=====================+=======+==============================|
+| udba-nvidia-gfxG0   |  Yes  |  Provides Nvidia Latest dr...|
+| udba-ati-gfxG0      |  No   |  Provides Legacy driver for..|
+| udba-broadcom-sta   |  Yes  |  Broadcom driver...          |
+|                     |       |                              |
+--------------------------------------------------------------
+                 [Install new recipe] [Build package] [Remove]
+
+- On Selection what to build scr is called with parameters
+ - ag_udba_build_scr <package name> 
+   package name automaticly select data from rpm info which tar.gz file to
+   use and is used for creating repository information
+- complex package is package which needs to build with 2 build cycles (or more?)
+  probably video driver components e.g. nvidia-kmp and X11-nvidia-gfx
+
+- on succesfull build, agent should call createrepo on produced rpm files
+  thus creating repository descriptor file which should be added to zypper
+  repositories list and explained to user (or auto install?) how to install
+  given packages from repository in this way if vendor ever provides
+  packages they should have bigger relevance than our locally built packages.
+
+- if build is not succesfull ask user to send build log for analysis...
+  DO NOT run create repo in that case
+
+
+- Extend this package with apache configuration that would allow exporting
+  of created repositories to other machines on lan - good for companies so
+  not everyone should do these tasks by themselfs (>100mbs downloads...)
+  folder should be /srv/udba-repos/ and all package folders mapped to:
+      http://hostname/udba/ or like
+
+
+
+TODO:
+	what if there is no internet for user??
+	maybe ask user to provide "source" packages into /usr/share/udba/xxx
+        self todo: fix build-udba-recepies :)
