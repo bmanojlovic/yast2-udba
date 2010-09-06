@@ -60,15 +60,16 @@ symbol WriteDialog() {
     return ret ? `next : `abort;
 }
 
-list<string> selected_packages = [];
+//list <map<string,any>> selected_packages = [];
 /**
  * Summary dialog
  * @return dialog result
  */
 any SummaryDialog() {
-
-    //selected_packages = Pkg::GetPackages(Symbol("udba-*"), false);
-    //y2milestone (selected_packages);
+ResolvableProperties
+    list <map <string,any> > packages_from_repo = Pkg::ResolvableProperties ("", `package, "");
+    //packages_from_repo = Pkg::ResolvableProperties("",`package, "");
+    y2milestone (packages_from_repo);
     /* Udba summary dialog caption */
     string caption = _("Universal Driver Build Assistant");
 

@@ -23,3 +23,5 @@ udba.pot
 autom4te.cache
 _cvsignore
 *~
+*.gz
+*.bz2
