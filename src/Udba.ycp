@@ -15,17 +15,46 @@
 module "Udba";
 textdomain "udba";
 
+import "Installation";
 import "Progress";
 import "Report";
 import "Summary";
 import "Message";
 import "Package";
 import "Popup";
+import "Pkg";
 
 /**
  * Prototypes
  */
 global boolean Modified();
+
+
+
+/**
+ * Initializes the package manager
+ */
+global boolean InitPkg () {
+    if (Pkg::TargetInitialize (Installation::destdir) != true) {
+        y2error ("Cannot initialize target");
+        return false;
+    }
+
+    if (Pkg::TargetLoad() != true) {
+        y2error ("Cannot load target");
+        return false;
+    }
+
+    if (Pkg::SourceStartManager (true) != true) {
+        y2error ("Cannot initialize sources");
+        return false;
+    }
+
+    return true;
+}
+
+
+
 
 /**
  * Data was modified?
@@ -138,7 +167,7 @@ global boolean Read() {
     // TODO FIXME Set the right number of stages
     integer steps = 4;
 
-    integer sl = 500;
+    integer sl = 200;
     sleep(sl);
 
     // TODO FIXME Names of real stages
