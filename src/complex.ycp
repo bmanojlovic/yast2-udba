@@ -17,7 +17,7 @@ import "Wizard";
 import "Wizard_hw";
 import "Confirm";
 import "Udba";
-
+import "Pkg";
 
 include "udba/helps.ycp";
 
@@ -60,12 +60,15 @@ symbol WriteDialog() {
     return ret ? `next : `abort;
 }
 
+list<string> selected_packages = [];
 /**
  * Summary dialog
  * @return dialog result
  */
 any SummaryDialog() {
 
+    //selected_packages = Pkg::GetPackages(Symbol("udba-*"), false);
+    //y2milestone (selected_packages);
     /* Udba summary dialog caption */
     string caption = _("Universal Driver Build Assistant");
 
@@ -83,7 +86,7 @@ any SummaryDialog() {
         `Left(
             `VBox (
                 `MinSize( 70, 3,
-                    /* A table header */
+                    // A table header
                     `Table(
                            `header("Package Name","Built","Description"), 
                            [
@@ -95,23 +98,25 @@ any SummaryDialog() {
                      ])
                 ),
                 `HBox (
-                    /* a push button */
+                    // a push button
                     `PushButton(`id("add_port"), _("&Add...")),
-                    /* a push button */
+                    // a push button
                     `PushButton(`id("edit_port"), _("&Edit...")),
-                    /* a push button */
+                    // a push button
                     `PushButton(`id("delete_port"), _("&Delete"))
-                ),
-                `VSpacing(1),
+                )
+             )
+        ));
+/*                `VSpacing(1),
                 `Frame (
-                    /* a dialog frame caption */
+                    // a dialog frame caption 
                     _("Server Features"),
                     `VBox (
-                        /* a check box */
+                        // a check box 
                         `Left(`CheckBox(`id("AllowTcpForwarding"), _("Allow &TCP Forwarding"))),
-                        /* a check box */
+                        // a check box 
                         `Left(`CheckBox(`id("X11Forwarding"),      _("Allow &X11 Forwarding"))),
-                        /* a check box */
+                        // a check box 
                         `Left(`CheckBox(`id("Compression"),        _("Allow &Compression")))
                     )
                 ),
@@ -119,7 +124,7 @@ any SummaryDialog() {
             )
         )
     );
-
+*/
     Wizard::SetContentsButtons(caption, contents, HELPS["summary"]:"",
 	    Label::BackButton(), Label::FinishButton());
 

@@ -1,5 +1,8 @@
+autodocs-cc.ami
+autodocs-cc-base.ami
+autodocs-cc-off.ami
+autodocs-ycp.ami
 Makefile
-Makefile.am
 Makefile.am.common
 Makefile.in
 aclocal.m4
