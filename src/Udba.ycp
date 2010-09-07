@@ -173,25 +173,32 @@ global boolean Read() {
     // TODO FIXME Names of real stages
     // We do not set help text here, because it was set outside
     Progress::New( caption, " ", steps, [
-	    /* Progress stage 1/3 */
-	    _("Check for required packages..."),
+            /* Progress stage 1/3 */
+            _("Initialize Package Manager..."),
 	    /* Progress stage 2/3 */
-	    _("Read the previous settings"),
+	    _("Check for required packages..."),
 	    /* Progress stage 3/3 */
-	    _("Detect the devices")
+	    _("Read the previous settings")
 	], [
 	    /* Progress step 1/3 */
-	    _("Checking for required packages..."),
+	    _("Initalizing Package Manager..."),
 	    /* Progress step 2/3 */
-	    _("Reading the previous settings..."),
+	    _("Checking for required packages..."),
 	    /* Progress step 3/3 */
-	    _("Detecting the devices..."),
+	    _("Reading the previous settings..."),
 	    /* Progress finished */
 	    _("Finished")
 	],
 	""
     );
 
+    // Initialize Package Manager...
+    if(Abort()) return false;
+    Progress::NextStage();
+    InitPkg();
+
+
+    // heck for required packages...
     boolean success = true;
 
     if(Abort()) return false;
@@ -205,7 +212,7 @@ global boolean Read() {
         }
     }
 
-    // read current settings
+    // Read the previous settings
     if(Abort()) return false;
     Progress::NextStage();
     /* Error message */
@@ -217,11 +224,6 @@ global boolean Read() {
     Progress::NextStage();
     /* Error message */
     if(false) Report::Warning(_("Cannot detect devices."));
-    sleep(sl);
-
-    if(Abort()) return false;
-    /* Progress finished */
-    Progress::NextStage();
     sleep(sl);
 
     if(Abort()) return false;

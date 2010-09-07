@@ -66,7 +66,6 @@ symbol WriteDialog() {
  * @return dialog result
  */
 any SummaryDialog() {
-    Udba::InitPkg();
     // list of $[ "name":string, "version":string, "arch":string, "source":integer, "status":symbol, "locked":boolean ] maps
     //list <map <string,any> > packages_from_repo = Pkg::ResolvableProperties ("", `package, "");
     //foreach( map<string,any> p, Pkg::ResolvableProperties ("", `package, ""), {
@@ -74,42 +73,12 @@ any SummaryDialog() {
     //});
 
 
-        list <map <string,any> > products = Pkg::ResolvableProperties ("", `product, "");
-
-        foreach (map<string, any> p, products, {
-            // Product is not installed
-            //if (p["status"]:`unknown != `installed) return;
-
-            // Make the logs readable
-            p["license"] = "...";
-            p["description"] = "...";
-
-            string product_name = p["name"]:"";
-            string product_version = p["version"]:"";
-
-            if (product_name == nil || product_name == "") {
-                y2error ("Cannot distinguish product name: %1", product_name);
-                return;
-            }
-
-            // Product version is the same but release can be different
-            // product map doesn't contain the release string. To be sure, product will be reinstalled
-            y2milestone ("Upgrading product %1 version %2", product_name, product_version);
-            // The version is the same, release can be different
-            if (Pkg::ResolvableInstall (product_name, `product) != true) {
-                Report::Error (sformat(_("Cannot update installed product %1."), product_name));
-                return;
-            }
-
-        });
-
-
     foreach (map<string,any> pkg, Pkg::ResolvableProperties("", `package, ""), {
-//        if (pkg["status"]:`none == `available ||)
-//        {
-            // patch requiring reboot should be installed in this run
-            y2milestone("XXXXXXXXXXXXXXXXXXX> %1", pkg);
-//        }
+	string pkg_name = pkg["name"]:"";
+        if (regexpmatch(pkg_name, "^udba-" ) == true)
+        {  
+            y2milestone("Package:  %1\n", pkg);
+        }
     });
 
 
@@ -119,14 +88,7 @@ any SummaryDialog() {
     /* Udba summary dialog caption */
     string caption = _("Universal Driver Build Assistant");
 
-    /* FIXME */
     list summary = Udba::Summary();
-    list unconfigured = summary[1]:["ovo","ono","levo","desno"];
-    string configured = summary[0]:"kaoovo";
-
-    /* Frame label */
-//    term contents = Wizard_hw::DetectedContent(_("Currently available and built recepies"),
-//	    unconfigured, false, configured);
 
     term contents = `VBox (
         `Left(`Label(_("Currently configured and build status of driver recipes"))),
