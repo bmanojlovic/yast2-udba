@@ -24,3 +24,5 @@ autom4te.cache
 _cvsignore
 *~
 *.ybc
+.dep
+
