@@ -99,12 +99,12 @@ any SummaryDialog() {
                     `Table(
                            `header("Package Name","Built","Description"), 
                            [
-                           `item(`id(1), "udba-nvidia-gfx","Yes", "opis"),
-                           `item(`id(2), "udba-broadcom-sta","No","blab al"),
-                           `item(`id(3), "nesto","Yes", ""),
-                           `item(`id(4), "zika","No",""),
-                           `item(`id(5), "slika","No","")
-                     ])
+                               `item(`id(1), "udba-nvidia-gfx","Yes", "opis"),
+                               `item(`id(2), "udba-broadcom-sta","No","blab al"),
+                               `item(`id(3), "nesto","Yes", ""),
+                               `item(`id(4), "zika","No",""),
+                               `item(`id(5), "slika","No","")
+                           ])
                 ),
                 `HBox (
                     // [Install new recipe] [Build recipe] [Remove recipe]
