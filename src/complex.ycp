@@ -96,7 +96,8 @@ any SummaryDialog() {
             `VBox (
                 `MinSize( 70, 3,
                     // A table header
-                    `Table(
+                    `Table(`id(`table),
+                           `opt(`notify),
                            `header("Package Name","Built","Description"), 
                            [
                                `item(`id(1), "udba-nvidia-gfx","Yes", "opis"),
@@ -131,15 +132,18 @@ any SummaryDialog() {
 	    if(ReallyAbort()) break;
 	    else continue;
 	}
+	if (ret == `table) {
+	    integer package_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
+	    string package_name = (string) UI::QueryWidget(`table, `Cell( package_id, 0 ) ) ;
+	    y2milestone(package_name);
+        }
         /* overview dialog */
-        else if(ret == `InstallNewRecipe) {
+        else if(ret == "BuildRecipe") {
             ret = `overview;
             break;
         }
-        /* configure the selected device */
-        else if(ret == `InstallNewRecipe) {
-	    // TODO FIXME: check for change of the configuration
-            any selected = UI::QueryWidget(`id(`detected_selbox), `CurrentItem);
+        else if(ret == "InstallNewRecipe") {
+            any selected = UI::QueryWidget(`id(`table), `CurrentItem);
             if(selected == `other) {
                 ret = `other;
             }

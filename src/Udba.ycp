@@ -219,12 +219,6 @@ global boolean Read() {
     if(false) Report::Error(Message::CannotReadCurrentSettings());
     sleep(sl);
 
-    // detect devices
-    if(Abort()) return false;
-    Progress::NextStage();
-    /* Error message */
-    if(false) Report::Warning(_("Cannot detect devices."));
-    sleep(sl);
 
     if(Abort()) return false;
     modified = false;
