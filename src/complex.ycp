@@ -66,30 +66,24 @@ symbol WriteDialog() {
  * @return dialog result
  */
 any SummaryDialog() {
-    // list of $[ "name":string, "version":string, "arch":string, "source":integer, "status":symbol, "locked":boolean ] maps
-    //list <map <string,any> > packages_from_repo = Pkg::ResolvableProperties ("", `package, "");
-    //foreach( map<string,any> p, Pkg::ResolvableProperties ("", `package, ""), {
-    //        y2milestone (">>>>>>> %1", p["name"])
-    //});
-
-
+    list<term> packageList = [];
+    integer key = 1;
     foreach (map<string,any> pkg, Pkg::ResolvableProperties("", `package, ""), {
-	string pkg_name = pkg["name"]:"";
+        string pkg_name = pkg["name"]:"";
         if (regexpmatch(pkg_name, "^udba-" ) == true)
         {  
+            packageList = add( packageList, `item( `id(key), pkg["name"]:nil,
+                "Yes", pkg["available"]:"No", pkg["description"]:nil));
+            key = key + 1;
             y2milestone("Package:  %1\n", pkg);
         }
     });
 
-
-    //packages_from_repo = Pkg::ResolvableProperties("",`package, "");
-    //y2milestone (">>>>>>>>>%1", packages_from_repo);
-
-    /* Udba summary dialog caption */
     string caption = _("Universal Driver Build Assistant");
 
     list summary = Udba::Summary();
-
+    
+    
     term contents = `VBox (
         `Left(`Label(_("Currently configured and build status of driver recipes"))),
         `Left(
@@ -98,14 +92,15 @@ any SummaryDialog() {
                     // A table header
                     `Table(`id(`table),
                            `opt(`notify),
-                           `header("Package Name","Built","Description"), 
-                           [
-                               `item(`id(1), "udba-nvidia-gfx","Yes", "opis"),
-                               `item(`id(2), "udba-broadcom-sta","No","blab al"),
-                               `item(`id(3), "nesto","Yes", ""),
-                               `item(`id(4), "zika","No",""),
-                               `item(`id(5), "slika","No","")
-                           ])
+                           `header("Package Name","Built","Upgrade Available","Description"), 
+							packageList)
+                           /*[
+                               `item(`id(1), "udba-nvidia-gfx","Yes", "Yes", "opis"),
+                               `item(`id(2), "udba-broadcom-sta","No", "Yes", "blab al"),
+                               `item(`id(3), "nesto","Yes", "Yes", ""),
+                               `item(`id(4), "zika","No", "Yes", ""),
+                               `item(`id(5), "slika","No", "Yes", "")
+                           ])*/
                 ),
                 `HBox (
                     // [Install new recipe] [Build recipe] [Remove recipe]
@@ -125,12 +120,12 @@ any SummaryDialog() {
     any ret = nil;
     while(true) {
 
-	ret = UI::UserInput();
+        ret = UI::UserInput();
 
-	/* abort? */
-	if(ret == `abort || ret == `cancel || ret == `back) {
-	    if(ReallyAbort()) break;
-	    else continue;
+        /* abort? */
+        if(ret == `abort || ret == `cancel || ret == `back) {
+            if(ReallyAbort()) break;
+            else continue;
 	}
 	if (ret == `table) {
 	    integer package_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
