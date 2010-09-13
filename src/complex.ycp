@@ -68,12 +68,20 @@ symbol WriteDialog() {
 any SummaryDialog() {
     list<term> packageList = [];
     integer key = 1;
+	string available = "No";
     foreach (map<string,any> pkg, Pkg::ResolvableProperties("", `package, ""), {
         string pkg_name = pkg["name"]:"";
-        if (regexpmatch(pkg_name, "^udba-" ) == true)
+		if (regexpmatch(pkg_name, "^udba-" ) == true)
         {  
+			if ( pkg["status"]:nil == `installed) {
+				available="No";
+			} else if (pkg["status"]:nil == `available) {
+				available="Yes";
+			} else {
+				available="No";
+			}
             packageList = add( packageList, `item( `id(key), pkg["name"]:nil,
-                "Yes", pkg["available"]:"No", pkg["description"]:nil));
+                "Yes", available, pkg["summary"]:nil));
             key = key + 1;
             y2milestone("Package:  %1\n", pkg);
         }
@@ -93,14 +101,7 @@ any SummaryDialog() {
                     `Table(`id(`table),
                            `opt(`notify),
                            `header("Package Name","Built","Upgrade Available","Description"), 
-							packageList)
-                           /*[
-                               `item(`id(1), "udba-nvidia-gfx","Yes", "Yes", "opis"),
-                               `item(`id(2), "udba-broadcom-sta","No", "Yes", "blab al"),
-                               `item(`id(3), "nesto","Yes", "Yes", ""),
-                               `item(`id(4), "zika","No", "Yes", ""),
-                               `item(`id(5), "slika","No", "Yes", "")
-                           ])*/
+                            packageList)
                 ),
                 `HBox (
                     // [Install new recipe] [Build recipe] [Remove recipe]
