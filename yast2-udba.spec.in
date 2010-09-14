@@ -26,6 +26,6 @@ Summary:	Universal Driver Build Assistant
 @clientdir@/udba.ycp
 @clientdir@/udba_*.ycp
 @moduledir@/Udba.*
-@moduledir@/Udba2.*
+/usr/sbin/udba
 @desktopdir@/udba.desktop
 %doc @docdir@

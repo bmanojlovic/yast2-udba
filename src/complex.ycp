@@ -81,7 +81,7 @@ any SummaryDialog() {
 				available="No";
 			}
             packageList = add( packageList, `item( `id(key), pkg["name"]:nil,
-                "Yes", available, pkg["summary"]:nil));
+                "Yes", pkg["version"]:"Null",available, pkg["summary"]:nil));
             key = key + 1;
             y2milestone("Package:  %1\n", pkg);
         }
@@ -100,7 +100,7 @@ any SummaryDialog() {
                     // A table header
                     `Table(`id(`table),
                            `opt(`notify),
-                           `header("Package Name","Built","Upgrade Available","Description"), 
+                           `header("Package Name","Built","Version", "Upgrade Available","Description"), 
                             packageList)
                 ),
                 `HBox (
