@@ -50,6 +50,30 @@ symbol ReadDialog() {
 }
 
 /**
+ * Function check if disk is in list of devices
+ * @param string disk
+ * @param list<string> list of devices
+ * @return true if success
+ */
+
+boolean isPackageInList (string packagename, list<any> packageList)
+{
+    boolean ret = false;
+    foreach(term termList, packageList,
+    {
+		y2milestone(termList[2]:nil);
+//        if (contains (termList[2]:nil ,packagename))
+//        {
+//           ret = true;
+//           y2milestone ("already exist!!!!!!!");
+//           break;
+//        }
+    });
+    return ret;
+}
+
+
+/**
  * Write settings dialog
  * @return `abort if aborted and `next otherwise
  */
@@ -69,6 +93,7 @@ any SummaryDialog() {
     list<term> packageList = [];
     integer key = 1;
 	string available = "No";
+    string pkg_version = "0.0";
     foreach (map<string,any> pkg, Pkg::ResolvableProperties("", `package, ""), {
         string pkg_name = pkg["name"]:"";
 		if (regexpmatch(pkg_name, "^udba-" ) == true)
@@ -80,6 +105,7 @@ any SummaryDialog() {
 			} else {
 				available="No";
 			}
+			isPackageInList (pkg_name, packageList);
             packageList = add( packageList, `item( `id(key), pkg["name"]:nil,
                 "Yes", pkg["version"]:"Null",available, pkg["summary"]:nil));
             key = key + 1;
