@@ -18,6 +18,7 @@ import "Wizard_hw";
 import "Confirm";
 import "Udba";
 import "Pkg";
+import "Package";
 
 include "udba/helps.ycp";
 
@@ -60,34 +61,35 @@ list<term> updatePkgList (list<term> packageList, term vals)
 {
     string ver1 = "";
     string ver2 = "";
-    list<term> packageList_updated = [];
+    list<term> copyOfpackageList = [];
     
     if ( size (packageList) == 0 ) {
         y2milestone("LIST EMPTY ADDING");
-        packageList_updated = add (packageList_updated, vals);
-        return packageList_updated;
+        copyOfpackageList = add (copyOfpackageList, vals);
+        return copyOfpackageList;
     }
-    
+    copyOfpackageList = packageList;
     boolean exist = false;
+    integer idx = 0;
+    
     foreach(term t, packageList, {
-        y2milestone("$$$$$$: %1", t);
-        //if (t[1]:nil == vals[1]:nil && t[3]:nil != vals[3]:nil) {
         if (t[1]:nil == vals[1]:nil) {
-            y2milestone("found same package updateing... not adding new");
+            y2milestone("package in list removing...: %1", vals[1]:nil);
             ver1 = (string) t[3]:nil;
             ver2 = (string) vals[3]:nil;
-            t[3] = mergestring([ ver1, ver2 ], ":");
-            exist = true;
-            packageList_updated = add (packageList_updated, t);
-        } else {
-            packageList_updated = add (packageList_updated, vals);
+            if ( ver1 < ver2 ) {
+                vals[3] = mergestring([ ver1, ver2 ], " : ");
+                vals[4] = "Update Available";
+            } else if ( ver1 == ver2 ) {
+                vals[4] = "No Update Available";
+            }
+            copyOfpackageList = remove(copyOfpackageList,idx);
+            break;
         }
-        if (exist == true ) {
-            exist = false;
-            continue;
-        }
+        idx = idx + 1;
     });
-    return packageList_updated;
+    copyOfpackageList = add (copyOfpackageList, vals);
+    return copyOfpackageList;
 }
 
 
@@ -110,28 +112,24 @@ symbol WriteDialog() {
 any SummaryDialog() {
     list<term> packageList = [];
     integer key = 1;
-    string available = "No";
+    string available = "";
     string pkg_version = "0.0";
     foreach (map<string,any> pkg, Pkg::ResolvableProperties("", `package, ""), {
         string pkg_name = pkg["name"]:"";
         if (regexpmatch(pkg_name, "^udba-" ) == true) {  
-            if ( pkg["status"]:nil == `installed) {
-                available="No";
-            } else if (pkg["status"]:nil == `available) {
-                available="Yes";
-            } else {
-                available="No";
+            if (pkg["status"]:nil == `available) {
+                available="Not Installed";
             }
-            packageList = updatePkgList (packageList,`item( 
-                                                        `id(key), 
-                                                        pkg["name"]:nil,
-                                                        "Yes", 
-                                                        pkg["version"]:"Null",
-                                                        available, 
-                                                        pkg["summary"]:nil
-                                                    ));
+            packageList = updatePkgList (packageList,
+                                        `item( 
+                                            `id(key), 
+                                            pkg["name"]:nil,
+                                            "Yes", 
+                                            pkg["version"]:"Null",
+                                            available, 
+                                            pkg["summary"]:nil
+                                        ));
             key = key + 1;
-            //y2milestone("Package:  %1\n", pkg);
         }
     });
 
@@ -154,9 +152,9 @@ any SummaryDialog() {
                 `HBox (
                     // [Install new recipe] [Build recipe] [Remove recipe]
                     // a push button
-                    `PushButton(`id("InstallNewRecipe"), _("Install new recipe")),
+                    `PushButton(`id("InstallOrUpdate"), _("Install / Update recipe")),
                     // a push button
-                    `PushButton(`id("BuildRecipe"), _("Build recipe")),
+                    `PushButton(`id("BuildRecipe"), _("Build / Rebuild recipe")),
                     // a push button
                     `PushButton(`id("RemoveRecipe"), _("Remove recipe"))
                 )
@@ -175,24 +173,32 @@ any SummaryDialog() {
         if(ret == `abort || ret == `cancel || ret == `back) {
             if(ReallyAbort()) break;
             else continue;
-	}
-	if (ret == `table) {
-	    integer package_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
-	    string package_name = (string) UI::QueryWidget(`table, `Cell( package_id, 0 ) ) ;
-	    y2milestone("%1", package_name);
+        }
+        if (ret == `table) {
+            integer package_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
+            string package_name = (string) UI::QueryWidget(`table, `Cell( package_id, 0 ) ) ;
+            y2milestone("%1", package_name);
         }
         /* overview dialog */
         else if(ret == "BuildRecipe") {
             ret = `overview;
             break;
         }
-        else if(ret == "InstallNewRecipe") {
+        else if(ret == "InstallOrUpdate") {
             any selected = UI::QueryWidget(`id(`table), `CurrentItem);
             if(selected == `other) {
                 ret = `other;
-            }
-            else {
-                ret = `configure;
+            } else {
+                integer row_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
+                string update_available = (string) UI::QueryWidget(`table, `Cell( row_id, 3 ) ) ;
+                string package_name = (string) UI::QueryWidget(`table, `Cell( row_id, 0 ) ) ;
+                y2milestone("Update for '%1' is '%2'", package_name, update_available);
+                if (Package::InstalledAll([package_name]) == false) {
+                    Package::InstallAll([package_name]);
+                    ret = `add;
+                } else {
+                    continue;
+                }
             }
             break;
         }
