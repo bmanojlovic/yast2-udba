@@ -19,6 +19,7 @@ import "Confirm";
 import "Udba";
 import "Pkg";
 import "Package";
+import "Popup";
 
 include "udba/helps.ycp";
 
@@ -104,12 +105,12 @@ symbol WriteDialog() {
     return ret ? `next : `abort;
 }
 
-//list <map<string,any>> selected_packages = [];
 /**
- * Summary dialog
- * @return dialog result
+ * Updates Available packages table
+ * @return list <term>
  */
-any SummaryDialog() {
+
+list <term> PreparePackagesList() {
     list<term> packageList = [];
     integer key = 1;
     string available = "";
@@ -132,11 +133,21 @@ any SummaryDialog() {
             key = key + 1;
         }
     });
+    return packageList;
+}
+
+//list <map<string,any>> selected_packages = [];
+/**
+ * Summary dialog
+ * @return dialog result
+ */
+any SummaryDialog() {
 
     string caption = _("Universal Driver Build Assistant");
-
+    
     list summary = Udba::Summary();
     
+    list<term> packageList = PreparePackagesList();
     
     term contents = `VBox (
         `Left(`Label(_("Currently configured and build status of driver recipes"))),
@@ -148,8 +159,8 @@ any SummaryDialog() {
                            `opt(`notify),
                            `header("Package Name","Built","Version", "Upgrade Available","Description"), 
                             packageList)
-                ),
-                `HBox (
+            ),
+            `HBox (
                     // [Install new recipe] [Build recipe] [Remove recipe]
                     // a push button
                     `PushButton(`id("InstallOrUpdate"), _("Install / Update recipe")),
@@ -157,12 +168,13 @@ any SummaryDialog() {
                     `PushButton(`id("BuildRecipe"), _("Build / Rebuild recipe")),
                     // a push button
                     `PushButton(`id("RemoveRecipe"), _("Remove recipe"))
-                )
-             )
+                ),
+            `VSpacing(`opt(`hstretch), 1)
+           )
         ));
 
     Wizard::SetContentsButtons(caption, contents, HELPS["summary"]:"",
-	    Label::BackButton(), Label::FinishButton());
+        Label::BackButton(), Label::FinishButton());
 
     any ret = nil;
     while(true) {
@@ -195,7 +207,13 @@ any SummaryDialog() {
                 y2milestone("Update for '%1' is '%2'", package_name, update_available);
                 if (Package::InstalledAll([package_name]) == false) {
                     Package::InstallAll([package_name]);
-                    ret = `add;
+                    Popup::ShowFeedback(_("Updating package information"),
+                                        _("This may take a while"));
+                    // this takes time...
+                    list <term> tmplist = PreparePackagesList();
+                    Popup::ClearFeedback();
+                    UI::ChangeWidget(`id(`table),`Items, tmplist);
+                    continue;
                 } else {
                     continue;
                 }
@@ -239,7 +257,7 @@ any OverviewDialog() {
     any ret = nil;
     while(true) {
 
-    ret = UI::UserInput();
+    ret = UI::UserInput(); 
 
     /* abort? */
     if(ret == `abort || ret == `cancel) {
