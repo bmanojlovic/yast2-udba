@@ -193,8 +193,9 @@ any SummaryDialog() {
         }
         /* overview dialog */
         else if(ret == "BuildRecipe") {
-            ret = `overview;
-            break;
+            Package::InstallAny(["udba-nvidia-gfxG02"]);
+            continue;
+//            break;
         }
         else if(ret == "InstallOrUpdate") {
             any selected = UI::QueryWidget(`id(`table), `CurrentItem);
