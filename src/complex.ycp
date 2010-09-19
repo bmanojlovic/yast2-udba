@@ -51,10 +51,22 @@ symbol ReadDialog() {
     return ret ? `next : `abort;
 }
 
+
 /**
- * Function check if disk is in list of devices
- * @param string disk
- * @param list<string> list of devices
+ * Write settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+symbol WriteDialog() {
+    Wizard::RestoreHelp(HELPS["write"]:"");
+    Udba::SetAbortFunction(PollAbort);
+    boolean ret = Udba::Write();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Function updates list of packages 
+ * @param list <term> packageList 
+ * @param term vals 
  * @return list<term>
  */
 
@@ -94,16 +106,6 @@ list<term> updatePkgList (list<term> packageList, term vals)
 }
 
 
-/**
- * Write settings dialog
- * @return `abort if aborted and `next otherwise
- */
-symbol WriteDialog() {
-    Wizard::RestoreHelp(HELPS["write"]:"");
-    Udba::SetAbortFunction(PollAbort);
-    boolean ret = Udba::Write();
-    return ret ? `next : `abort;
-}
 
 /**
  * Create list of udba-* packages 
@@ -191,12 +193,15 @@ any SummaryDialog() {
             string package_name = (string) UI::QueryWidget(`table, `Cell( package_id, 0 ) ) ;
             y2milestone("%1", package_name);
         }
-        /* overview dialog */
+        /* BuildRecipe dialog */
         else if(ret == "BuildRecipe") {
-            Package::InstallAny(["udba-nvidia-gfxG02"]);
-            continue;
-//            break;
+            ret = `overview;
         }
+        /* RemoveRecipe dialog */
+        else if(ret == "RemoveRecipe") {
+            ret = `overview;
+        }
+        /* RemoveRecipe dialog */
         else if(ret == "InstallOrUpdate") {
             any selected = UI::QueryWidget(`id(`table), `CurrentItem);
             if(selected == `other) {
@@ -232,7 +237,7 @@ any SummaryDialog() {
 
     return ret;
 }
-
+//
 /**
  * Overview dialog
  * @return dialog result
@@ -246,9 +251,9 @@ any OverviewDialog() {
 
     /* FIXME table header */
     term contents = Wizard_hw::ConfiguredContent(
-    /* Table header */
-    `header(_("Number"), _("Udba")),
-    overview, nil, nil, nil, nil );
+        /* Table header */
+        `header(_("Number"), _("Udba")),
+        overview, nil, nil, nil, nil );
 
     contents = Wizard_hw::SpacingAround(contents, 1.5, 1.5, 1.0, 1.0);
 
@@ -258,39 +263,38 @@ any OverviewDialog() {
     any ret = nil;
     while(true) {
 
-    ret = UI::UserInput(); 
+        ret = UI::UserInput(); 
 
-    /* abort? */
-    if(ret == `abort || ret == `cancel) {
-        if(ReallyAbort()) break;
-        else continue;
+        /* abort? */
+        if(ret == `abort || ret == `cancel) {
+            if(ReallyAbort()) break;
+            else continue;
+        }
+            /* add */
+            else if(ret == `add_button) {
+            /* FIXME */
+                ret = `add;
+                break;
+            }
+            /* edit */
+            else if(ret == `edit_button) {
+            /* FIXME */
+                ret = `edit;
+                break;
+            }
+            /* delete */
+            else if(ret == `delete_button) {
+            /* FIXME */
+                continue;
+            }
+            else if(ret == `next || ret == `back) {
+                break;
+            }
+            else {
+                y2error("unexpected retcode: %1", ret);
+                continue;
+            }
     }
-        /* add */
-        else if(ret == `add_button) {
-        /* FIXME */
-            ret = `add;
-            break;
-        }
-        /* edit */
-        else if(ret == `edit_button) {
-        /* FIXME */
-            ret = `edit;
-            break;
-        }
-        /* delete */
-        else if(ret == `delete_button) {
-        /* FIXME */
-            continue;
-        }
-        else if(ret == `next || ret == `back) {
-            break;
-        }
-        else {
-            y2error("unexpected retcode: %1", ret);
-            continue;
-        }
-    }
-
     return ret;
 }
 

@@ -21,40 +21,58 @@ include "udba/helps.ycp";
 
 
 /**
- * Configure1 dialog
+ * BuildProcess dialog
  * @return dialog result
  */
-any Configure1Dialog () {
+any BuildProcess () {
 
     /* Udba configure1 dialog caption */
     string caption = _("Udba Configuration");
 
     /* Udba configure1 dialog contents */
-    term contents = `Label (_("Second part of configuration of udba"));
+    term contents =     `VBox(
+        `VSpacing(0.5),
+        `HSpacing( `opt(`hstretch), 80),
+        `HBox(
+            `Label("Searching in directory: "),
+            `Label(`id(`dir), `opt(`hstretch), "")
+        ),
+        `VSpacing(0.5),
+        `PushButton(`id(`abort), Label::AbortButton()),
+        `VSpacing(0.5)
+    );
 
     Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
-	    Label::BackButton(), Label::NextButton());
+        Label::BackButton(), Label::NextButton());
 
+    // set buffer size if the progress should be updated more times
+    // SCR::Write(.background.buffer_size, 10);
+            
+    // start subprocess
+    SCR::Execute(.background.run_output, "/usr/lib/udba/build-driver-G02-binary");
+    list<string> script_out = [];
     any ret = nil;
-    while(true) {
+    while((boolean)SCR::Read(.background.output_open) || (boolean)(SCR::Read(.background.newlines) > 0))
+    {
+        script_out = (list<string>)SCR::Read(.background.newout);
 
-	ret = UI::UserInput();
+        // parse output in script_out and update progress in dialog accordingly
+        UI::ChangeWidget(`id(`dir), `Value, script_out[size(script_out) - 1]:"");
 
-	/* abort? */
-	if(ret == `abort || ret == `cancel) {
-	    if(ReallyAbort()) break;
-	    else continue;
-	}
-        else if(ret == `next || ret == `back) {
-            break;
-        }
-        else {
-            y2error("unexpected retcode: %1", ret);
-            continue;
-        }
-    }
-
-    return ret;
+        while ((integer)SCR::Read(.background.newlines) == 0 && (boolean)SCR::Read(.background.output_open))
+        {
+            sleep(100);     // small delay
+        
+            ret = (symbol) UI::PollInput();
+            
+            // check if abort button was pressed
+            if (ret == `abort)
+            {
+                SCR::Execute(.background.kill, nil);        // kill subprocess
+                break; 
+            }
+        }       
+    }       
 }
 
 /**

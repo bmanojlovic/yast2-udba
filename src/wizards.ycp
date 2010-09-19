@@ -25,14 +25,14 @@ any AddSequence() {
 
     /* FIXME: adapt to your needs */
     map aliases = $[
-	"config1"	: ``(Configure1Dialog()),
+	"build1"	: ``(BuildProcess()),
 	"config2"	: ``(Configure2Dialog()),
     ];
 
     /* FIXME: adapt to your needs */
     map sequence = $[
-	"ws_start" : "config1",
-	"config1" : $[
+	"ws_start" : "build1",
+	"build1" : $[
 	    `abort	: `abort,
 	    `next	: "config2"
 	],
