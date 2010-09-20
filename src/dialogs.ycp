@@ -30,17 +30,13 @@ any BuildProcess () {
     string caption = _("Udba Configuration");
 
     /* Udba configure1 dialog contents */
-    term contents =     `VBox(
-        `VSpacing(0.5),
-        `HSpacing( `opt(`hstretch), 80),
-        `HBox(
-            `Label("Searching in directory: "),
-            `Label(`id(`dir), `opt(`hstretch), "")
-        ),
-        `VSpacing(0.5),
-        `PushButton(`id(`abort), Label::AbortButton()),
-        `VSpacing(0.5)
-    );
+    term contents = `VBox(
+            `LogView(`id(`log),
+                "Buil&d Output",
+                10,    // visible lines
+                100),  // lines to store 
+            `PushButton(`id(`abortbuild), `opt(`default), "&Cancel Build")
+            );
 
     Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
         Label::BackButton(), Label::NextButton());
@@ -49,30 +45,39 @@ any BuildProcess () {
     // SCR::Write(.background.buffer_size, 10);
             
     // start subprocess
-    SCR::Execute(.background.run_output, "/usr/lib/udba/build-driver-G02-binary");
-    list<string> script_out = [];
-    any ret = nil;
-    while((boolean)SCR::Read(.background.output_open) || (boolean)(SCR::Read(.background.newlines) > 0))
-    {
-        script_out = (list<string>)SCR::Read(.background.newout);
+    integer id = (integer)(SCR::Execute(.process.start_shell, "/usr/lib/udba/build-driver-G02-binary 2>&1"));
+    string line = "";
+    any ret = `abort;
+    while(SCR::Read(.process.running, id) == true) {
+        line = (string)SCR::Read(.process.read_line_stderr, id);
+        if (line != nil) {
+            //y2warning("STDERR: %1", line);
+            UI::ChangeWidget(`id(`log), `LastLine, sformat("STDERR:%1\n", line));
+        }
+        line = (string)SCR::Read(.process.read_line, id);
 
-        // parse output in script_out and update progress in dialog accordingly
-        UI::ChangeWidget(`id(`dir), `Value, script_out[size(script_out) - 1]:"");
-
-        while ((integer)SCR::Read(.background.newlines) == 0 && (boolean)SCR::Read(.background.output_open))
-        {
-            sleep(100);     // small delay
-        
-            ret = (symbol) UI::PollInput();
-            
-            // check if abort button was pressed
-            if (ret == `abort)
-            {
-                SCR::Execute(.background.kill, nil);        // kill subprocess
-                break; 
-            }
-        }       
-    }       
+        if (line != nil) {
+            y2warning("BUILD: %1", line);
+            UI::ChangeWidget(`id(`log), `LastLine, sformat("STDOUT:%1\n", line));
+        } else {
+            // there was no input, wait for a while
+            // give the subprocess time to print something
+            // this is relativelly high number as needed for download to complete...
+            sleep(300);
+        }
+        ret = (symbol) UI::PollInput();
+        if( ret != nil ) {
+            y2milestone ("ret=%1", ret);
+        }
+        // check if the abort button was pressed
+        if (ret == `abortbuild) {
+            SCR::Execute(.process.kill, id);        // kill the subprocess
+            ret = `back;
+            break;
+        }
+    }
+    if (ret == nil ) ret = `back;
+    return ret;
 }
 
 /**

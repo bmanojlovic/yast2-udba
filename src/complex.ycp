@@ -195,10 +195,12 @@ any SummaryDialog() {
         }
         /* BuildRecipe dialog */
         else if(ret == "BuildRecipe") {
-            ret = `overview;
+            y2milestone("BuildRecipe is called");
+            ret = `configure;
         }
         /* RemoveRecipe dialog */
         else if(ret == "RemoveRecipe") {
+            y2milestone("RemoveRecipe is called");
             ret = `overview;
         }
         /* RemoveRecipe dialog */
@@ -232,10 +234,11 @@ any SummaryDialog() {
         else {
             y2error("unexpected retcode: %1", ret);
             continue;
-        }
+        }    
+        y2milestone ("Returning ret=%1", ret);
+        return ret;
     }
 
-    return ret;
 }
 //
 /**
