@@ -1,0 +1,53 @@
+#! /bin/bash
+cd /tmp/udba/nvidia-gfxG02
+rpm -q kernel-source > /dev/null
+if [  $? -ne 0 ] ; then
+	echo "missing kernel-source and other needed packages for build"
+	echo "installing them with zypper"
+	zypper in kernel-source kernel-syms update-desktop-files
+fi
+# again to be sure it really installed packages if not exit with warning
+rpm -q kernel-source > /dev/null
+if [  $? -ne 0 ] ; then
+	echo "Installation of required packages failed"
+	echo "for some reason start this script again"
+	exit -1
+fi
+sh fetch.sh
+HOME=$(pwd)
+mkdir -p rpmdir
+mkdir -p srpmdir
+mkdir -p builddir
+UM=$(uname -m)
+if [ $UM == "i686" ] ; then
+	UM="i586"
+fi
+export HOME
+cat << E__O__F > .rpmmacros
+%_topdir %(echo "`pwd`")
+%_builddir %(echo "`pwd`/builddir")
+%_rpmdir %(echo "`pwd`/rpmdir")
+%_sourcedir %(echo "`pwd`")
+%_specdir %(echo "`pwd`")
+%_srcrpmdir %(echo "`pwd`/srpmdir")
+E__O__F
+/usr/bin/rpmbuild -ba *-g*G02.spec
+echo "###########################################"
+echo "########## First part of build done########"
+echo "###########################################"
+find "${HOME}/rpmdir/${UM}"  -type f -ls
+
+echo "###########################################"
+echo "####### Press enter to continue build #####"
+echo "###########################################"
+
+#read pause
+/usr/bin/rpmbuild -ba x11-video-*G02.spec
+echo "###########################################"
+echo "############### All Done ##################"
+echo "###########################################"
+echo 
+echo "Now install files from ${HOME}/rpmdir/${UM}"
+echo "Files:"
+find "${HOME}/rpmdir/${UM}"  -type f -ls
+sleep 10

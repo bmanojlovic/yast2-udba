@@ -1,0 +1,42 @@
+#! /bin/bash
+function usage() {
+	echo "Usage:"
+	echo "	$0 <Project Name> <Mode of operation>"
+	echo ""
+	echo "Project Name"
+	echo "	string - name of recipe to build"
+	echo ""
+	echo "Modes of operation:"
+	echo "	test - Show download command used for fetching source"
+	echo "	get - Retrieve data from URL"
+	echo ""
+	echo "Example:"
+	echo "	$0 nvidia-gfxG02 get"
+	echo ""
+	exit 0
+}
+
+if [ $# -lt 2 ] ; then
+	usage
+fi
+MODE=$1
+PROJECT=$2
+
+case "$MODE" in
+	get)
+		cd /usr/src/udba/${PROJECT}/
+		sh fetch.sh
+		;;
+	test)
+		# there is hope that noone will hardcode 
+		# path to curl or wget or aria2c in fetch.sh
+		# if this fails next step will be to create chroot and execute 
+		# it inside...
+		PATH=/usr/lib/udba/fakebin:$PATH
+		cd /usr/src/udba/${PROJECT}/
+		sh fetch.sh
+		;;
+	*)
+		usage
+		;;
+esac
