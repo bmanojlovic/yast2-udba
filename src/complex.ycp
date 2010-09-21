@@ -137,6 +137,30 @@ list <term> PreparePackagesList() {
     });
     return packageList;
 }
+/*
+ there is no popup from DoRemove package call so lets fake it
+*/
+boolean ShouldRemovePackage(string package_name) {
+    return Popup::YesNoHeadline( "These packages will be removed:?", package_name);
+}
+
+/**
+ * Helper functions for getting package name from table selection
+ * @return string package name
+*/
+string GetPackageName() {
+    integer row_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
+    return (string) UI::QueryWidget(`table, `Cell( row_id, 0 ));
+}
+
+/**
+ * Helper functions for getting package status from table selection
+ * @return string status
+*/
+string GetUpdateStatus() {
+    integer row_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
+    return (string) UI::QueryWidget(`table, `Cell( row_id, 3 ));
+}
 
 //list <map<string,any>> selected_packages = [];
 /**
@@ -188,31 +212,36 @@ any SummaryDialog() {
             if(ReallyAbort()) break;
             else continue;
         }
-        if (ret == `table) {
-            integer package_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
-            string package_name = (string) UI::QueryWidget(`table, `Cell( package_id, 0 ) ) ;
-            y2milestone("%1", package_name);
+        else if (ret == `table) {
+            continue;
         }
         /* BuildRecipe dialog */
         else if(ret == "BuildRecipe") {
             y2milestone("BuildRecipe is called");
+            Udba::current_working_package = GetPackageName();
             ret = `configure;
         }
         /* RemoveRecipe dialog */
         else if(ret == "RemoveRecipe") {
             y2milestone("RemoveRecipe is called");
-            ret = `overview;
+            string package_name = GetPackageName();
+            if (ShouldRemovePackage(package_name) == true ) {
+                Package::DoRemove([ package_name ]);
+                list <term> tmplist = PreparePackagesList();
+                Popup::ClearFeedback();
+                UI::ChangeWidget(`id(`table),`Items, tmplist);
+            }
+            continue;
         }
         /* RemoveRecipe dialog */
         else if(ret == "InstallOrUpdate") {
+            y2milestone("InstallOrUpdate is called");
             any selected = UI::QueryWidget(`id(`table), `CurrentItem);
             if(selected == `other) {
                 ret = `other;
             } else {
-                integer row_id  = (integer) UI::QueryWidget(`id(`table), `CurrentItem);
-                string update_available = (string) UI::QueryWidget(`table, `Cell( row_id, 3 ) ) ;
-                string package_name = (string) UI::QueryWidget(`table, `Cell( row_id, 0 ) ) ;
-                y2milestone("Update for '%1' is '%2'", package_name, update_available);
+                string package_name = GetPackageName();
+                y2milestone("Update for '%1' is '%2'", GetPackageName(), GetUpdateStatus());
                 if (Package::InstalledAll([package_name]) == false) {
                     Package::InstallAll([package_name]);
                     Popup::ShowFeedback(_("Updating package information"),
@@ -239,66 +268,6 @@ any SummaryDialog() {
         return ret;
     }
 
-}
-//
-/**
- * Overview dialog
- * @return dialog result
- */
-any OverviewDialog() {
-
-    /* Udba overview dialog caption */
-    string caption = _("Udba Overview");
-
-    list overview = Udba::Overview();
-
-    /* FIXME table header */
-    term contents = Wizard_hw::ConfiguredContent(
-        /* Table header */
-        `header(_("Number"), _("Udba")),
-        overview, nil, nil, nil, nil );
-
-    contents = Wizard_hw::SpacingAround(contents, 1.5, 1.5, 1.0, 1.0);
-
-    Wizard::SetContentsButtons(caption, contents, HELPS["overview"]:"",
-        Label::BackButton(), Label::FinishButton());
-
-    any ret = nil;
-    while(true) {
-
-        ret = UI::UserInput(); 
-
-        /* abort? */
-        if(ret == `abort || ret == `cancel) {
-            if(ReallyAbort()) break;
-            else continue;
-        }
-            /* add */
-            else if(ret == `add_button) {
-            /* FIXME */
-                ret = `add;
-                break;
-            }
-            /* edit */
-            else if(ret == `edit_button) {
-            /* FIXME */
-                ret = `edit;
-                break;
-            }
-            /* delete */
-            else if(ret == `delete_button) {
-            /* FIXME */
-                continue;
-            }
-            else if(ret == `next || ret == `back) {
-                break;
-            }
-            else {
-                y2error("unexpected retcode: %1", ret);
-                continue;
-            }
-    }
-    return ret;
 }
 
 /* EOF */

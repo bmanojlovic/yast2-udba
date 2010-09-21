@@ -41,11 +41,20 @@ any BuildProcess () {
     Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
         Label::BackButton(), Label::NextButton());
 
+    // assume it does not exist for some strange reason...
+    SCR::Execute(.target.bash, "mkdir -p /var/tmp/udba-build-root/");
+
+    // get file name of recipe tar archive
+    map output = (map) SCR::Execute (.target.bash_output, sformat("/bin/rpm -ql %1", Udba::current_working_package));
+    string recipe_archive = output["stdout"]:"";
+    y2milestone(recipe_archive);
+    SCR::Execute(.target.bash, sformat("/bin/tar -C /var/tmp/udba-build-root/ -zvxf %1",recipe_archive));
+
     // set buffer size if the progress should be updated more times
-    // SCR::Write(.background.buffer_size, 10);
+    SCR::Write(.process.buffer_size, 30);
             
     // start subprocess
-    integer id = (integer)(SCR::Execute(.process.start_shell, "/usr/lib/udba/build-driver-G02-binary"));
+    integer id = (integer)(SCR::Execute(.process.start_shell, sformat ( "/usr/lib/udba/bin/udba-builder %1", Udba::current_working_package)));
     string line = "";
     any ret = `abort;
     while(SCR::Read(.process.running, id) == true) {

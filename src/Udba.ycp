@@ -54,7 +54,7 @@ global boolean InitPkg () {
 }
 
 
-
+global string current_working_package = "";
 
 /**
  * Data was modified?
