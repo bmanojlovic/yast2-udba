@@ -27,5 +27,13 @@ Summary:	Universal Driver Build Assistant
 @clientdir@/udba_*.ycp
 @moduledir@/Udba.*
 /usr/sbin/udba
+%dir /usr/lib/udba
+%dir /usr/lib/udba/bin
+%dir /usr/lib/udba/fakebin/
+/usr/lib/udba/bin/udba-builder
+/usr/lib/udba/bin/udba-fetcher
+/usr/lib/udba/fakebin/aria2c  
+/usr/lib/udba/fakebin/curl  
+/usr/lib/udba/fakebin/wget
 @desktopdir@/udba.desktop
 %doc @docdir@
