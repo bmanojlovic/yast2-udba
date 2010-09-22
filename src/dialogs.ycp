@@ -57,9 +57,7 @@ any BuildProcess () {
     });
     SCR::Execute(.target.bash, sformat("/bin/tar -C /var/tmp/udba-build-root/ -zvxf %1",recipe_archive));
 
-    // set buffer size if the progress should be updated more times
-    SCR::Write(.process.buffer_size, 30);
-            
+
     // start subprocess
     integer id = (integer)(SCR::Execute(.process.start_shell, sformat ( "/usr/lib/udba/bin/udba-builder %1", Udba::current_working_package)));
     string line = "";
