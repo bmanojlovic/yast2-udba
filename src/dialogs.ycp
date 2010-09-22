@@ -45,9 +45,16 @@ any BuildProcess () {
     SCR::Execute(.target.bash, "mkdir -p /var/tmp/udba-build-root/");
 
     // get file name of recipe tar archive
-    map output = (map) SCR::Execute (.target.bash_output, sformat("/bin/rpm -ql %1|grep tar.gz", Udba::current_working_package));
-    string recipe_archive = output["stdout"]:"";
-    y2milestone(recipe_archive);
+    map output = (map) SCR::Execute (.target.bash_output, sformat("/bin/rpm -ql %1", Udba::current_working_package));
+    string recipe_archive = "";
+    //y2milestone(recipe_archive);
+    foreach (string line ,output["stdout"]:"", {
+        if (regexpmatch(line, "\.tar\.gz$" ) == true) {  
+            y2milestone("Matched: %1", line);
+            recipe_archive = line;
+            break;
+        }
+    });
     SCR::Execute(.target.bash, sformat("/bin/tar -C /var/tmp/udba-build-root/ -zvxf %1",recipe_archive));
 
     // set buffer size if the progress should be updated more times
