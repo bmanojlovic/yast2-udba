@@ -48,7 +48,7 @@ any BuildProcess () {
     map output = (map) SCR::Execute (.target.bash_output, sformat("/bin/rpm -ql %1", Udba::current_working_package));
     string recipe_archive = "";
     //y2milestone(recipe_archive);
-    foreach (string line ,output["stdout"]:"", {
+    foreach (string line ,splitstring(output["stdout"]:"","\n"), {
         if (regexpmatch(line, "\.tar\.gz$" ) == true) {  
             y2milestone("Matched: %1", line);
             recipe_archive = line;
