@@ -14,7 +14,7 @@ textdomain "udba";
 import "Label";
 import "Popup";
 import "Wizard";
-import "Wizard_hw";
+//import "Wizard_hw";
 import "Confirm";
 import "Udba";
 import "Pkg";
