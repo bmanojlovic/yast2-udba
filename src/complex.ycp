@@ -127,7 +127,6 @@ list <term> PreparePackagesList() {
                                         `item( 
                                             `id(key), 
                                             pkg["name"]:nil,
-                                            "Yes", 
                                             pkg["version"]:"Null",
                                             available, 
                                             pkg["summary"]:nil
@@ -183,7 +182,7 @@ any SummaryDialog() {
                     // A table header
                     `Table(`id(`table),
                            `opt(`notify),
-                           `header("Package Name","Built","Version", "Upgrade Available","Description"), 
+                           `header("Package Name", "Version", "Upgrade Available","Description"), 
                             packageList)
             ),
             `HBox (
