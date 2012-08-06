@@ -34,7 +34,7 @@ any BuildProcess () {
             `LogView(`id(`log),
                 "Buil&d Output",
                 10,    // visible lines
-                100),  // lines to store 
+                0),  // lines to store 
             `PushButton(`id(`abortbuild), `opt(`default), "&Cancel Build")
             );
 
@@ -74,7 +74,8 @@ any BuildProcess () {
             y2warning("BUILD-O: %1", line);
             UI::ChangeWidget(`id(`log), `LastLine, sformat("STDOUT:%1\n", line));
         } else {
-            sleep(300);
+            sleep(10); // sleep 10 is good enough so it is not hogging system while building :)
+                       // and fast enough to not slow down build...
         }
         ret = (symbol) UI::PollInput();
         if( ret != nil ) {

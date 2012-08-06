@@ -1,0 +1,32 @@
+#! /bin/bash
+PACKAGE_NAME=$(echo $1|sed -e 's/udba-//g')
+cd /var/tmp/udba-build-root/${PACKAGE_NAME}/
+HOME=$(pwd)
+mkdir -p rpmdir
+mkdir -p srpmdir
+mkdir -p /srv/repos/${PACKAGE_NAME}/
+UM=$(uname -m)
+if [ $UM == "i686" ] ; then
+	UM="i586"
+fi
+export HOME
+sh -x fetch.sh
+cat << E__O__F > .rpmmacros
+%_topdir %(echo "`pwd`")
+%_builddir %(echo "`pwd`/builddir")
+%_rpmdir %(echo "/srv/repos/${PACKAGE_NAME}")
+%_sourcedir %(echo "`pwd`")
+%_specdir %(echo "`pwd`")
+%_srcrpmdir %(echo "`pwd`/srpmdir")
+E__O__F
+for rpmspec in *.spec; do
+	/usr/bin/rpmbuild -ba ${rpmspec}
+	echo "###########################################"
+	echo "########## First part of build done########"
+	echo "###########################################"
+	find "/srv/repos/${PACKAGE_NAME}/${UM}"  -type f -ls
+done
+set -x
+#zypper addrepo  "/srv/repos/${PACKAGE_NAME}" "${PACKAGE_NAME}"
+#zypper modifyrepo --refresh "${PACKAGE_NAME}"
+#sleep 50
