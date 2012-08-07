@@ -26,6 +26,6 @@ for rpmspec in *.spec; do
 	# nothing smart here really...
 	/usr/bin/rpmbuild -ba ${rpmspec}
 done
-find "/srv/repos/${PACKAGE_NAME}/${UM}"  -type f -ls
+find "/srv/repos/${PACKAGE_NAME}"  -type f -ls
 sleep 1
 echo "UDBA: Build Complete"
