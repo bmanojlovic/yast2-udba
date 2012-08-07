@@ -15,10 +15,11 @@ import "Label";
 import "Wizard";
 import "Udba";
 import "Package";
-
+import "Popup";
+import "SourceManager";
 
 include "udba/helps.ycp";
-
+include "packager/repositories_include.ycp";
 
 /**
  * BuildProcess dialog
@@ -46,8 +47,8 @@ any BuildProcess () {
 
     // get file name of recipe tar archive
     map output = (map) SCR::Execute (.target.bash_output, sformat("/bin/rpm -ql %1", Udba::current_working_package));
+    y2milestone(">>RECIPE>> %1",Udba::current_working_package);
     string recipe_archive = "";
-    //y2milestone(recipe_archive);
     foreach (string line ,splitstring(output["stdout"]:"","\n"), {
         if (regexpmatch(line, "\.tar\.gz$" ) == true) {  
             y2milestone("Matched: %1", line);
@@ -68,13 +69,13 @@ any BuildProcess () {
             y2warning("BUILD-E: %1", line);
             UI::ChangeWidget(`id(`log), `LastLine, sformat("STDERR:%1\n", line));
         }
-        line = (string)SCR::Read(.process.read_line, id);
 
+        line = (string)SCR::Read(.process.read_line, id);
         if (line != nil) {
             y2warning("BUILD-O: %1", line);
             UI::ChangeWidget(`id(`log), `LastLine, sformat("STDOUT:%1\n", line));
         } else {
-            sleep(10); // sleep 10 is good enough so it is not hogging system while building :)
+            sleep(10); // sleep 10 ms is good enough so it is not hogging system while building :)
                        // and fast enough to not slow down build...
         }
         ret = (symbol) UI::PollInput();
@@ -88,6 +89,43 @@ any BuildProcess () {
             break;
         }
     }
+    y2milestone("----------- LINE START --------");
+    y2milestone("STDOUT=%1", line); // it should really be "UDBA: Build Complete" but not too reliable so lets 
+                                    // assume set -e is a lot more better in this :)
+    y2milestone("------------ LINE END ---------");
+
+    integer retval = (integer) SCR::Read (.process.status, id);
+    if (retval != nil && retval != 0) {
+        Popup::Warning("Package building failed, please look at /var/log/YaST2/y2log file for clues");
+    } else {
+//    if ( line == "UDBA: Build Complete" ) {
+	string reponame = substring(Udba::current_working_package,search(Udba::current_working_package,"-") + 1);
+        map<string, any> newSrcMap = $[  "enabled"       : true,  
+                                         "autorefresh"   : true,
+                                         "name"          : reponame,
+                                         "alias"         : reponame,
+                                         "base_urls"     : [ sformat("dir:///srv/repos/%1", reponame) ],
+                                         "priority"      : 99
+                                     ];
+
+        y2milestone("Adding repository  %1",substring(Udba::current_working_package,search(Udba::current_working_package,"-") + 1));
+        integer newSrcID = Pkg::RepositoryAdd( newSrcMap );
+        if (newSrcID != nil)
+        {
+            y2milestone("Successfully added the \"%1\" repository to the system.",substring(Udba::current_working_package,search(Udba::current_working_package,"-") + 1));
+        }
+        else
+        {
+            y2error("Could not add \"%1\".",substring(Udba::current_working_package,search(Udba::current_working_package,"-") + 1));
+        }
+    
+        y2milestone("Saving all source changes to the system.");
+        Popup::AnyMessage (_("UDBA Build Done!"),
+                           sformat("Requested recipe is built succesfully\nAdded >%1< repository to system",reponame));
+
+        Pkg::SourceSaveAll();
+    }
+
     if (ret == nil ) ret = `back;
     return ret;
 }
