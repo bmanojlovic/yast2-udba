@@ -25,20 +25,19 @@ any AddSequence() {
 
     /* FIXME: adapt to your needs */
     map aliases = $[
-	"build1"	: ``(BuildProcess()),
-	"config2"	: ``(Configure2Dialog()),
+	"recipeSelection"	: ``(recipeSelectionDialog()),
+	"buildProcess"	: ``(buildProcessDialog()),
     ];
 
     /* FIXME: adapt to your needs */
     map sequence = $[
-	"ws_start" : "build1",
-	"build1" : $[
+	"ws_start" : "recipeSelection",
+	"recipeSelection" : $[
 	    `abort	: `abort,
-	    `next	: "config2"
+        `next   : "buildProcess"
 	],
-	"config2" : $[
-	    `abort	: `abort,
-	    `next	: `next
+	"buildProcess" : $[
+	    `abort	: `abort
 	]
     ];
 
@@ -46,7 +45,7 @@ any AddSequence() {
 }
 
 /**
- * Main workflow of the udba configuration
+ * Main workflow of the udba tool
  * @return sequence result
  */
 any MainSequence() {
@@ -121,7 +120,7 @@ any UdbaSequence() {
 any UdbaAutoSequence() {
 
     /* Initialization dialog caption */
-    string caption = _("Udba Configuration");
+    string caption = _("Universal Driver Build Assistant");
     /* Initialization dialog contents */
     term contents = `Label(_("Initializing..."));
 

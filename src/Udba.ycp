@@ -91,7 +91,7 @@ global list<string> required_packages = ["kernel-source", "kernel-syms", "update
 global define boolean Abort() ``{
     if(AbortFunction != nil)
     {
-	return AbortFunction () == true;
+        return AbortFunction () == true;
     }
     return false;
 }
@@ -192,7 +192,7 @@ global boolean Read() {
         success = Package::InstallAll(required_packages);
         if ( success == false ) {
             // error popup
-            Report::Error(_("Cannot install required packages\n UDBA cannot continue!"));
+            Report::Error(_("Cannot install required packages\n Universal Build Driver Assistant cannot continue!"));
             return false;
         }
     }
@@ -220,7 +220,7 @@ global boolean Write() {
     string caption = _("Saving udba Configuration");
 
     // TODO FIXME And set the right number of stages
-    integer steps = 2;
+    integer steps = 1;
 
     integer sl = 500;
     sleep(sl);
