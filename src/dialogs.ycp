@@ -19,6 +19,7 @@ import "Popup";
 import "SourceManager";
 
 include "udba/helps.ycp";
+include "udba/complex.ycp";
 include "packager/repositories_include.ycp";
 
 /**
