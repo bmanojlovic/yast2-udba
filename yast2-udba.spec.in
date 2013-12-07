@@ -1,6 +1,7 @@
 @HEADER-COMMENT@
 
 @HEADER@
+Url:            https://github.com/bmanojlovic/yast2-udba
 Requires:	yast2
 BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
 
