@@ -1,5 +1,5 @@
 #! /bin/bash
-# if there is some issue script will nto output required string and 
+# if there is some issue script will not output required string and 
 # udba will show failure
 set -e
 PACKAGE_NAME=$(echo $1|sed -e 's/udba-//g')

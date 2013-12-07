@@ -7,7 +7,7 @@ How this is suppose to work... (for now)
 --------------------------------------------------------------
 |     Package Name    | Built |    Descritption              |
 |=====================+=======+==============================|
-| udba-nvidia-gfxG0   |  Yes  |  Provides Nvidia Latest dr...|
+| udba-nvidia-gfxG3   |  Yes  |  Provides Nvidia Latest dr...|
 | udba-ati-gfxG0      |  No   |  Provides Legacy driver for..|
 | udba-broadcom-sta   |  Yes  |  Broadcom driver...          |
 |                     |       |                              |
