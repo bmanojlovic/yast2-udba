@@ -23,8 +23,8 @@ Summary:	Universal Driver Build Assistant
 %defattr(-,root,root)
 %dir @yncludedir@/udba
 @yncludedir@/udba/*
-@clientdir@/udba.ycp
-@clientdir@/udba_*.ycp
+@clientdir@/udba.rb
+@clientdir@/udba_*.rb
 @moduledir@/Udba.*
 /usr/sbin/udba
 %dir /usr/lib/udba
