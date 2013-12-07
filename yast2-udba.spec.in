@@ -9,7 +9,10 @@ BuildArchitectures:	noarch
 Summary:	Universal Driver Build Assistant
 
 %description
--
+YaST2 helper that enables you to build binary packages from
+sources which are not allowed to be hosted on OBS but can be
+built locally from it. Example are binary video drivers (nvidia)
+
 
 @PREP@
 

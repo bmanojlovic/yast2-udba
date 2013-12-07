@@ -17,7 +17,7 @@
 
 
 Name:           yast2-udba
-Version:        0.0.3
+Version:        0.0.5
 Release:        0
 License:	GPL-2.0
 Group:		System/YaST
@@ -34,7 +34,10 @@ BuildArchitectures:	noarch
 Summary:	Universal Driver Build Assistant
 
 %description
--
+YaST2 helper that enables you to build binary packages from
+sources which are not allowed to be hosted on OBS but can be
+built locally from it. Example are binary video drivers (nvidia)
+
 
 %prep
 %setup -n yast2-udba-%{version}
@@ -68,8 +71,8 @@ rm -rf "$RPM_BUILD_ROOT"
 %defattr(-,root,root)
 %dir /usr/share/YaST2/include/udba
 /usr/share/YaST2/include/udba/*
-/usr/share/YaST2/clients/udba.ycp
-/usr/share/YaST2/clients/udba_*.ycp
+/usr/share/YaST2/clients/udba.rb
+/usr/share/YaST2/clients/udba_*.rb
 /usr/share/YaST2/modules/Udba.*
 /usr/sbin/udba
 %dir /usr/lib/udba
