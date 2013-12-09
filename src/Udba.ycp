@@ -81,7 +81,7 @@ boolean() AbortFunction = Modified;
  * Required packages for operation
  * TODO Check do we really need kernel-source for building or kernel-syms should be sufficient?
  */
-global list<string> required_packages = ["kernel-source", "kernel-syms", "update-desktop-files", "patch", "gcc", "grep"];
+global list<string> required_packages = ["kernel-source", "kernel-syms", "update-desktop-files", "patch", "gcc", "grep", "rpm-build"];
 
 
 /**
