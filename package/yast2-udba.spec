@@ -17,7 +17,7 @@
 
 
 Name:           yast2-udba
-Version:        0.0.5
+Version:        0.0.6
 Release:        0
 License:	GPL-2.0
 Group:		System/YaST
