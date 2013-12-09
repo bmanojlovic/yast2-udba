@@ -23,9 +23,10 @@ License:	GPL-2.0
 Group:		System/YaST
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Source0:        yast2-udba-%{version}.tar.bz2
+Source0:        https://github.com/bmanojlovic/yast2-udba/archive/%{version}/yast2-udba-%{version}.tar.gz
 
 
+Url:            https://github.com/bmanojlovic/yast2-udba
 Requires:	yast2
 BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
 
