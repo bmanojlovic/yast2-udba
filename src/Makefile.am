@@ -1,29 +1,23 @@
-# Makefile.am for udba/src
+# Sources for udba
+
+module_DATA = \
+  modules/Udba.rb
+
+client_DATA = \
+  clients/udba_auto.rb \
+  clients/udba.rb \
+  clients/udba_proposal.rb
 
 yncludedir = @yncludedir@/udba
+ynclude_DATA = \
+  include/udba/wizards.rb \
+  include/udba/dialogs.rb \
+  include/udba/complex.rb \
+  include/udba/helps.rb
 
-client_DATA =			\
-	udba.ycp		\
-	udba_auto.ycp	\
-	udba_proposal.ycp
+desktop_DATA = \
+  desktop/udba.desktop
 
-ynclude_DATA =			\
-	helps.ycp		\
-	wizards.ycp		\
-	dialogs.ycp		\
-	complex.ycp
-
-desktop_DATA =			\
-	udba.desktop
-
-module_DATA =			\
-	Udba.ycp
-
-
-# create a symlink for local build, #145327
-udba:
-	ln -sf . $@
-ycpchook = udba
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
+EXTRA_DIST = $(module_DATA) $(client_DATA) $(ynclude_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
