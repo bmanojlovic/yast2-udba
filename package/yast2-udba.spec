@@ -19,7 +19,7 @@
 Name:           yast2-udba
 Version:        0.0.6
 Release:        0
-License:	GPL-2.0
+License:	GPL-2.0+
 Group:		System/YaST
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -44,29 +44,11 @@ built locally from it. Example are binary video drivers (nvidia)
 %setup -n yast2-udba-%{version}
 
 %build
-%{_prefix}/bin/y2tool y2autoconf
-%{_prefix}/bin/y2tool y2automake
-autoreconf --force --install
-
-export CFLAGS="$RPM_OPT_FLAGS -DNDEBUG"
-export CXXFLAGS="$RPM_OPT_FLAGS -DNDEBUG"
-
-./configure --libdir=%{_libdir} --prefix=%{_prefix} --mandir=%{_mandir}
-# V=1: verbose build in case we used AM_SILENT_RULES(yes)
-# so that RPM_OPT_FLAGS check works
-make %{?jobs:-j%jobs} V=1
+%yast_build
 
 %install
-make install DESTDIR="$RPM_BUILD_ROOT"
-[ -e "%{_prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK" ] || Y2DIR="$RPM_BUILD_ROOT/usr/share/YaST2" make check DESTDIR="$RPM_BUILD_ROOT"
-for f in `find $RPM_BUILD_ROOT/%{_prefix}/share/applications/YaST2/ -name "*.desktop"` ; do
-    d=${f##*/}
-    %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop}
-done
+%yast_install
 
-
-%clean
-rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
